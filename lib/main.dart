@@ -1,8 +1,11 @@
 
-import 'package:b4_olm/services/storage.dart';
-import 'package:flutter/material.dart';
-//import 'package:geolocator/geolocator.dart';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+
+import 'package:b4_olm/services/mylocation.dart';
+import 'package:b4_olm/services/storage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -63,26 +66,64 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  double latitude = 0.0;
+  double long = 0.0;
+  double newlat = 0.0;
+  double newlong = 0.0;
 
-  int _keystoreExist(){
+  String address= " ";
+  var lknown;
+  var isWeb = kIsWeb;
 
-   return 0;
+  int _keystoreExist() {
+    return 0;
   }
 
+  LocationMy myLoc = LocationMy();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  //  myLoc.getLatLong();
+    _getLLVal();
+  }
+  ///
+  void _getLLVal() {
+    Future<Position> data = LocationMy().determinePosition();
+    data.then( ( value  ) {
+      print("Lat and Long value :  $value");
+      setState(() {
+        latitude = value.latitude;
+        long = value.longitude;
+     });
+      _callFunct();
+    });
+}
+
+void _callFunct(){
+  Future<Position> ndata=myLoc.getLocation();
+  ndata.then((nvalue) {
+    print("nLat and nLong value :  $nvalue");
+    setState(() {
+      newlat = nvalue.latitude;
+      newlong = nvalue.longitude;
+    });
+
+  myLoc.getDistance(latitude,long,newlat,newlong);
+  myLoc.onMap(latitude,long,newlat,newlong);
+  if(isWeb == true){
+    address = 'try running on emulator ';
+    lknown = 'try running on emulator ';
+  }else{
+    myLoc.getAddress(latitude, long);
+    myLoc.getLKnown();
+  }
+  });
+}
   final SecureStorage secureStorage = SecureStorage();
 
- // LatLng currentPostion;
-/*
-  void _getUserLocation() async {
-  LocationPermission permission = await Geolocator.checkPermission();
-    var position = await GeolocatorPlatform.instance
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-    setState(() {
-      currentPostion = LatLng(position.latitude, position.longitude);
-   });
-  }
-*/
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -156,5 +197,7 @@ class _MyHomePageState extends State<MyHomePage> {
 //        child: const Icon(Icons.add),
 //      ), // This trailing comma makes auto-formatting nicer for build methods.
    );
-  }
+   }
+
+
 }
