@@ -1,6 +1,8 @@
 # b4_olm
 
-A new Flutter project.
+Peer to Peer  android and ios App for online marketting plaace
+
+Download app from plat store and app store
 
 ## Getting Started
 
